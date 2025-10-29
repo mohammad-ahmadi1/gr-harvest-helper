@@ -21,6 +21,8 @@ The official [harvest-jira](https://www.getharvest.com/apps-and-integrations/jir
 
 # Install the development version
 
+## For Chrome:
+
 - Get the code:
   - Either clone this repo (`git clone git@github.com:GreyRook/gr-harvest-helper.git`)
   - Or download as a zip and unzip it (`https://github.com/GreyRook/gr-harvest-helper/archive/master.zip`)
@@ -28,3 +30,24 @@ The official [harvest-jira](https://www.getharvest.com/apps-and-integrations/jir
 - Disable the Chrome Store version of this extension (if installed)
 - Enable developer mode via the toggle in the top right
 - Click on "Load unpacked" (top left button) and choose the folder of the cloned repo
+
+## For Firefox:
+
+### Development/Testing:
+- Get the code (same as above)
+- Open Firefox and navigate to `about:debugging#/runtime/this-firefox`
+- Click on "Load Temporary Add-on..."
+- Navigate to the extension folder and select the `manifest.json` file
+- The extension should now be loaded!
+
+### Package for Firefox Add-ons:
+To submit to [Mozilla Add-ons](https://addons.mozilla.org/developers/):
+
+1. Create a zip package from the project directory:
+   ```bash
+   zip -r gr-harvest-helper-firefox.zip .
+   ```
+
+2. Upload `gr-harvest-helper-firefox.zip` to [Firefox Add-ons Developer Hub](https://addons.mozilla.org/developers/addon/submit/)
+
+For more detailed Firefox instructions, see [FIREFOX_INSTALL.md](FIREFOX_INSTALL.md)

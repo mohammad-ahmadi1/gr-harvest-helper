@@ -8,41 +8,38 @@ let tabURL;
 let tab;
 let id;
 
-chrome.runtime.onMessage.addListener(function (response) {
+browser.runtime.onMessage.addListener(function (response) {
   id = response.id ? response.id : -1;
   taskName = response.title ? response.title : 'select a task first';
+  tabURL = response.url ? response.url : window.location.href;
+
+  // Append URL to the task name so it appears in the notes field
+  let taskNameWithUrl = taskName;
+  if (tabURL) {
+    taskNameWithUrl = taskName + '\n' + tabURL;
+  }
+
+  let item = { id: id, name: taskNameWithUrl };
+  const harvestTimer = document.getElementsByClassName('harvest-timer')[0];
+  if (harvestTimer) {
+    harvestTimer.setAttribute('data-item', JSON.stringify(item));
+    // Always set the permalink if we have a URL
+    if (tabURL) {
+      harvestTimer.setAttribute('data-permalink', tabURL);
+      console.log('Setting permalink to:', tabURL);
+    }
+    harvestTimer.click();
+    harvestTimer.setAttribute('top', '10px');
+  } else {
+    console.error('Harvest timer element not found');
+  }
 });
 
-chrome.tabs.query({ currentWindow: true, active: true }, function (activeTab) {
-  setTimeout(() => {
-    chrome.scripting.executeScript({ target: { tabId: tab[0].id }, files: ['/ticketName.js'] });
-  }, 1000);
+browser.tabs.query({ currentWindow: true, active: true }).then(function (activeTab) {
+  browser.tabs.executeScript(activeTab[0].id, { file: '/ticketName.js' });
   tab = activeTab;
   tabURL = tab[0].url;
 });
-
-window.onload = function () {
-  let i = 0;
-  const timeout = 2000; //2sec
-  const intervalTime = 10;
-  let taskNameInterval = setInterval(() => {
-    if (taskName !== undefined || i === timeout / intervalTime) {
-      clearInterval(taskNameInterval);
-      let item = { id: id, name: taskName };
-      const harvestTimer = document.getElementsByClassName('harvest-timer')[0];
-      if (harvestTimer) {
-        harvestTimer.setAttribute('data-item', JSON.stringify(item));
-        if (taskName !== undefined) {
-          harvestTimer.setAttribute('data-permalink', tabURL);
-        }
-        harvestTimer.click();
-        harvestTimer.setAttribute('top', '10px');
-      }
-    } else {
-      i++;
-    }
-  }, intervalTime);
-};
 
 let frameDetected = false;
 

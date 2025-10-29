@@ -21,9 +21,12 @@ function detectGitLab() {
 
 async function jiraGetIssue() {
   const issueId = jiraGetIssueId();
+  const issue = await jiraGetIssueTitle(issueId);
+  const ticketUrl = `${window.location.protocol}//${window.location.hostname}/browse/${issueId}`;
   return {
     id: issueId,
-    title: await jiraGetIssueTitle(issueId),
+    title: issue.fields.summary,
+    url: ticketUrl,
   };
 }
 
@@ -51,7 +54,8 @@ async function jiraGetIssueTitle(issueId) {
   })
     .then((response) => response.json())
     .then((data) => {
-      return data.fields.summary;
+      GRLog(data);
+      return data;
     });
 }
 
@@ -60,6 +64,7 @@ function zammadGetIssue() {
     document.getElementsByClassName('ticket-title-update js-objectTitle')?.[0]?.textContent ?? '';
   return {
     title: title,
+    url: window.location.href
   };
 }
 
@@ -70,18 +75,19 @@ function gitlabGetIssue() {
   return {
     id: taskId,
     title: title,
+    url: window.location.href,
   };
 }
 
 if (detectJira()) {
   GRLog('jira detected');
   jiraGetIssue().then((res) => {
-    chrome.runtime.sendMessage(res);
+    browser.runtime.sendMessage(res);
   });
 } else if (detectZammad()) {
   GRLog('zammad detected');
-  chrome.runtime.sendMessage(zammadGetIssue());
+  browser.runtime.sendMessage(zammadGetIssue());
 } else if (detectGitLab()) {
   GRLog('gitlab detected');
-  chrome.runtime.sendMessage(gitlabGetIssue());
+  browser.runtime.sendMessage(gitlabGetIssue());
 }
