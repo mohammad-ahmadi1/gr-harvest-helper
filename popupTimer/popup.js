@@ -8,7 +8,10 @@ let tabURL;
 let tab;
 let id;
 
+let messageReceived = false;
+
 browser.runtime.onMessage.addListener(function (response) {
+  messageReceived = true;
   id = response.id ? response.id : -1;
   taskName = response.title ? response.title : 'select a task first';
   tabURL = response.url ? response.url : window.location.href;
@@ -16,7 +19,7 @@ browser.runtime.onMessage.addListener(function (response) {
   // Append URL to the task name so it appears in the notes field
   let taskNameWithUrl = taskName;
   if (tabURL) {
-    taskNameWithUrl = taskName + '\n' + tabURL;
+    taskNameWithUrl = taskName + '\n';
   }
 
   let item = { id: id, name: taskNameWithUrl };
@@ -75,3 +78,17 @@ let detectFrame = setInterval(() => {
     clearInterval(detectFrame);
   }
 }, 10);
+
+setTimeout(() => { 
+  if (!messageReceived) {
+    console.error('No message received from ticketName.js - open popup without autofill');
+    
+    const harvestTimer = document.getElementsByClassName('harvest-timer')[0];
+    if (harvestTimer) {
+      harvestTimer.click();
+      harvestTimer.setAttribute('top', '10px');
+    } else {
+      console.error('Harvest timer element not found');
+    }
+  }
+}, 1000);

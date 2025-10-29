@@ -21,13 +21,24 @@ function detectGitLab() {
 
 async function jiraGetIssue() {
   const issueId = jiraGetIssueId();
-  const issue = await jiraGetIssueTitle(issueId);
-  const ticketUrl = `${window.location.protocol}//${window.location.hostname}/browse/${issueId}`;
-  return {
-    id: issueId,
-    title: issue.fields.summary,
-    url: ticketUrl,
-  };
+  
+  if (!issueId) {
+    GRLog('Could not extract Jira issue ID - popup will open without autofill');
+    return null;
+  }
+  
+  try {
+    const issue = await jiraGetIssueTitle(issueId);
+    const ticketUrl = `${window.location.protocol}//${window.location.hostname}/browse/${issueId}`;
+    return {
+      id: issueId,
+      title: issue.fields.summary,
+      url: ticketUrl,
+    };
+  } catch (error) {
+    GRLog('Error fetching Jira issue: ' + error.message);
+    return null;
+  }
 }
 
 function jiraGetIssueId() {
@@ -82,7 +93,9 @@ function gitlabGetIssue() {
 if (detectJira()) {
   GRLog('jira detected');
   jiraGetIssue().then((res) => {
-    browser.runtime.sendMessage(res);
+    if (res) {
+      browser.runtime.sendMessage(res);
+    }
   });
 } else if (detectZammad()) {
   GRLog('zammad detected');
@@ -90,4 +103,7 @@ if (detectJira()) {
 } else if (detectGitLab()) {
   GRLog('gitlab detected');
   browser.runtime.sendMessage(gitlabGetIssue());
+} else {
+  GRLog('no supported platform detected - popup will open without autofill');
+  // Don't send any message, allowing the popup to open normally
 }
