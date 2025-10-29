@@ -5,6 +5,7 @@ This document summarizes the changes made to make the extension compatible with 
 ## Files Modified
 
 ### 1. `manifest.json`
+
 - **Changed**: `manifest_version` from 3 to 2
   - Reason: Firefox has better support for Manifest V2
 - **Changed**: `action` to `browser_action`
@@ -17,23 +18,17 @@ This document summarizes the changes made to make the extension compatible with 
   - Reason: Firefox-specific settings including extension ID
 
 ### 2. `serviceWorker.js`
+
 - **Changed**: Added browser API polyfill check
   - Reason: Ensures compatibility with both Chrome and Firefox
 
 ### 3. `popupTimer/popup.js`
+
 - **Changed**: `browser.tabs.query` callback to promise-based
   - Reason: Firefox prefers promise-based APIs
 
-## Testing the Extension
-
-1. Open Firefox
-2. Navigate to `about:debugging#/runtime/this-firefox`
-3. Click "Load Temporary Add-on..."
-4. Select the `manifest.json` file from this project
-5. Test on Jira, Zammad, or GitLab pages
-
-## Notes
+<!-- ## Notes
 
 - The extension code already used the `browser` API which is native to Firefox
 - Chrome supports the `browser` API via a polyfill, so the code works on both browsers
-- For production deployment to Firefox Add-ons, you'll need to create a proper zip package and submit for review
+- For production deployment to Firefox Add-ons, you'll need to create a proper zip package and submit for review -->
